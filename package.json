@@ -1,0 +1,31 @@
+{
+  "name": "queue-health-watchdog",
+  "version": "1.0.0",
+  "description": "Read-only replication & job queue health monitor in TypeScript with snapshot trend heuristics, alert throttling, webhooks & live dashboard.",
+  "type": "module",
+  "main": "dist/src/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/src/index.js",
+    "test": "node --test dist/tests/*.test.js"
+  },
+  "keywords": [
+    "observability",
+    "monitoring",
+    "queue",
+    "replication",
+    "watchdog",
+    "typescript",
+    "sre",
+    "alerting"
+  ],
+  "author": "Gabriel Souza <gavicoding@gmail.com>",
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "typescript": "^5.7.2"
+  }
+}
