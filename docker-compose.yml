@@ -1,0 +1,13 @@
+services:
+  watchdog:
+    build: .
+    ports:
+      - "3080:3080"
+    environment:
+      PORT: "3080"
+      POLL_INTERVAL_MS: "5000"
+      PENDING_THRESHOLD: "50"
+      STALLED_WINDOW: "3"
+      COOLDOWN_MINUTES: "60"
+      # WEBHOOK_URL: "https://hooks.example.com/services/..."
+    restart: unless-stopped
