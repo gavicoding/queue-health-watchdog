@@ -13,9 +13,9 @@ Monitores simples baseados apenas em valor absoluto disparam falsos positivos em
 O **Queue Health Watchdog** mantém uma janela móvel de snapshots por `(nodeId, queueName)` e diferencia:
 
 - **`OK`**: pendentes abaixo do limite.
-- **`HIGH_LOAD`**: pendentes acima do limite, **mas com progresso real de processamento** na janela (`drainedDelta > 0`) — **não gera alerta falso**.
-- **`STALLED`**: pendentes acima do limite **e 0 itens processados** por `STALLED_WINDOW` ciclos seguidos — dispara alerta com *cooldown*.
-- **`ERROR`**: erro explícito retornado pelo worker/adaptador — escalonamento imediato.
+- **`HIGH_LOAD`**: pendentes acima do limite, **mas com progresso real de processamento** na janela (`drainedDelta > 0`) - **não gera alerta falso**.
+- **`STALLED`**: pendentes acima do limite **e 0 itens processados** por `STALLED_WINDOW` ciclos seguidos - dispara alerta com *cooldown*.
+- **`ERROR`**: erro explícito retornado pelo worker/adaptador - escalonamento imediato.
 - **`RECOVERY`**: notificação automática quando o nó volta para `OK` ou `HIGH_LOAD`.
 
 ---

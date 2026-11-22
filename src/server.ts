@@ -124,7 +124,7 @@ function renderDashboardHtml(runtime: WatchdogRuntime): string {
           .slice(0, 10)
           .map(
             (a) =>
-              `<li><code>${escapeHtml(a.timestamp)}</code> — <strong>${escapeHtml(a.kind)}</strong>: ${escapeHtml(a.message)}</li>`,
+              `<li><code>${escapeHtml(a.timestamp)}</code> - <strong>${escapeHtml(a.kind)}</strong>: ${escapeHtml(a.message)}</li>`,
           )
           .join("")}</ul>`;
 
