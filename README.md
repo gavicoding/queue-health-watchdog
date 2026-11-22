@@ -14,14 +14,14 @@ A **read-only replication and job-queue observability engine** in TypeScript tha
 
 ## Why Snapshot Trend Heuristics Matter
 
-Naive queue monitors fire false alarms whenever pending items cross a fixed threshold — even when consumers are healthy and actively clearing a peak-hour burst.
+Naive queue monitors fire false alarms whenever pending items cross a fixed threshold - even when consumers are healthy and actively clearing a peak-hour burst.
 
 **Queue Health Watchdog** stores a bounded time-series of snapshots per `(nodeId, queueName)` and compares progress across the last `N` polling cycles (`STALLED_WINDOW`):
 
 | Status | Condition | Alert Emitted? |
 | :--- | :--- | :--- |
 | **`OK`** | `pendingCount < pendingThreshold` and no error | Triggers **`RECOVERY`** if previously alerting |
-| **`HIGH_LOAD`** | `pendingCount >= threshold`, **but consumer drained > 0 items** (or queue shrank) in window | No — avoids alert fatigue during normal spikes |
+| **`HIGH_LOAD`** | `pendingCount >= threshold`, **but consumer drained > 0 items** (or queue shrank) in window | No - avoids alert fatigue during normal spikes |
 | **`STALLED`** | `pendingCount >= threshold` **and 0 progress** across `STALLED_WINDOW` consecutive cycles | Yes (throttled per `COOLDOWN_MINUTES`) |
 | **`ERROR`** | Adapter reported an explicit worker/replication exception | Yes (immediate escalation) |
 
@@ -52,8 +52,8 @@ npm start
 ```
 
 Open **[http://localhost:3080](http://localhost:3080)** for the live auto-refreshing status dashboard, or query the JSON APIs:
-- `GET /api/status` — current heuristic evaluation for every node/queue plus recent alert events
-- `GET /api/health` — liveness probe (`uptimeSeconds`, `lastRunAt`, `activeIncidents`)
+- `GET /api/status` - current heuristic evaluation for every node/queue plus recent alert events
+- `GET /api/health` - liveness probe (`uptimeSeconds`, `lastRunAt`, `activeIncidents`)
 
 ### Run with Docker
 
@@ -88,10 +88,10 @@ Implement the `QueueSourceAdapter` interface in `src/types.ts` with strictly rea
 npm test
 ```
 
-Uses Node.js built-in `node:test` runner — tests heuristic classification (`OK`, `HIGH_LOAD`, `STALLED`, `ERROR`), alert cooldown suppression & `RECOVERY` emission, and live HTTP endpoint responses.
+Uses Node.js built-in `node:test` runner - tests heuristic classification (`OK`, `HIGH_LOAD`, `STALLED`, `ERROR`), alert cooldown suppression & `RECOVERY` emission, and live HTTP endpoint responses.
 
 ---
 
 ## License
 
-Apache License 2.0 — see [LICENSE](LICENSE).
+Apache License 2.0 - see [LICENSE](LICENSE).
