@@ -12,6 +12,20 @@ A **read-only replication and job-queue observability engine** in TypeScript tha
 
 ---
 
+## In plain words
+
+Most queue monitors say "more than 50 items pending, send an alert". Every busy hour crosses that line even when everything works, so people learn to ignore the alerts, and nobody looks on the day the queue really gets stuck.
+
+This monitor keeps snapshots over time and checks whether items **are still moving**: a busy queue that keeps draining is fine, a queue where nothing moved for a while is stuck.
+
+**What you gain**
+
+- **Alerts people take seriously:** they only fire when something is really wrong.
+- **No alert storms:** the same incident does not send a message every minute, and a recovery notice tells you when it is over.
+- **Safe in production:** it only reads; it never writes to the database it watches.
+
+---
+
 ## Why Snapshot Trend Heuristics Matter
 
 Naive queue monitors fire false alarms whenever pending items cross a fixed threshold - even when consumers are healthy and actively clearing a peak-hour burst.
