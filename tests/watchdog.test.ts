@@ -4,7 +4,7 @@ import { SimulatorQueueAdapter } from "../src/adapters/simulator.js";
 import { evaluateQueueHistory } from "../src/engine/classifier.js";
 import { SnapshotStore } from "../src/engine/store.js";
 import { AlertThrottler } from "../src/engine/throttler.js";
-import type { AlertNotifier } from "../src/notifiers/webhook.js";
+import { CompositeNotifier, type AlertNotifier } from "../src/notifiers/webhook.js";
 import { createHttpServer, WatchdogRuntime } from "../src/server.js";
 import type { AlertEvent, QueueSnapshot, WatchdogThresholds } from "../src/types.js";
 
@@ -92,6 +92,41 @@ test("throttler suppresses duplicate alerts during cooldown and emits RECOVERY",
   const recovery = throttler.evaluate(recoveredEval, t0 + 65 * 60_000);
   assert.equal(recovery?.kind, "RECOVERY");
   assert.equal(throttler.activeIncidentCount(), 0);
+});
+
+test("composite notifier reports a failed channel and still delivers to the others", async () => {
+  const delivered: AlertEvent[] = [];
+  const failures: Array<{ index: number; message: string }> = [];
+  const composite = new CompositeNotifier(
+    [
+      {
+        async notify() {
+          throw new Error("Webhook delivery failed with HTTP 500");
+        },
+      },
+      {
+        async notify(event) {
+          delivered.push(event);
+        },
+      },
+    ],
+    (error, _event, index) => failures.push({ index, message: (error as Error).message }),
+  );
+
+  const event: AlertEvent = {
+    id: "evt-1",
+    kind: "STALLED",
+    nodeId: "node-01",
+    queueName: "upload",
+    status: "STALLED",
+    pendingCount: 120,
+    message: "[STALLED] node-01/upload",
+    timestamp: "2026-11-22T12:00:00.000Z",
+  };
+  await composite.notify(event);
+
+  assert.equal(delivered.length, 1);
+  assert.deepEqual(failures, [{ index: 0, message: "Webhook delivery failed with HTTP 500" }]);
 });
 
 test("WatchdogRuntime and HTTP server expose live health, status, and dashboard", async () => {

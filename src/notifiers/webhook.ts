@@ -38,14 +38,36 @@ export class WebhookNotifier implements AlertNotifier {
   }
 }
 
+export type NotifierErrorHandler = (error: unknown, event: AlertEvent, index: number) => void;
+
+const logNotifierError: NotifierErrorHandler = (error, event, index) => {
+  const detail = error instanceof Error ? error.message : String(error);
+  console.error(
+    `[watchdog] notifier #${index} failed to deliver ${event.kind} for ${event.nodeId}/${event.queueName}: ${detail}`,
+  );
+};
+
+/**
+ * Sends each alert to every notifier. One failing channel never blocks the others,
+ * but its failure is reported (by default on stderr) instead of being dropped silently.
+ */
 export class CompositeNotifier implements AlertNotifier {
   private readonly notifiers: readonly AlertNotifier[];
+  private readonly onError: NotifierErrorHandler;
 
-  constructor(notifiers: readonly AlertNotifier[]) {
+  constructor(notifiers: readonly AlertNotifier[], onError: NotifierErrorHandler = logNotifierError) {
     this.notifiers = notifiers;
+    this.onError = onError;
   }
 
   async notify(event: AlertEvent): Promise<void> {
-    await Promise.allSettled(this.notifiers.map((notifier) => notifier.notify(event)));
+    const results = await Promise.allSettled(
+      this.notifiers.map((notifier) => notifier.notify(event)),
+    );
+    results.forEach((result, index) => {
+      if (result.status === "rejected") {
+        this.onError(result.reason, event, index);
+      }
+    });
   }
 }
